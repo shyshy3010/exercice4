@@ -105,3 +105,13 @@ exports.calculateVacationResults = async (req, res) => {
         res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
 };
+// Fonction pour obtenir toutes les vacances
+exports.getVacations = async (req, res) => {
+    try {
+        const vacationData = require('../data/vacation.json');
+        res.json({ success: true, data: vacationData });
+    } catch (error) {
+        console.error('Error fetching vacations:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+};
