@@ -81,3 +81,27 @@ exports.updateVacationDetails = async (req, res) => {
         res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
 };
+// Fonction pour calculer les résultats des vacances
+exports.calculateVacationResults = async (req, res) => {
+    const query = `
+      SELECT vacation_type, destinations, start_date, end_date, COUNT(*) as count
+      FROM tbl_61_preferences
+      GROUP BY vacation_type, destinations, start_date, end_date
+      ORDER BY count DESC
+      LIMIT 1
+    `;
+  
+    try {
+        const connection = await createConnection();
+        const [results] = await connection.execute(query);
+
+        if (results.length === 0) {
+            return res.status(404).json({ success: false, message: 'No vacation preferences found' });
+        }
+
+        res.status(200).json({ success: true, results: results[0] });
+    } catch (error) {
+        console.error('Error fetching vacation results:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+};
