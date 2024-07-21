@@ -49,3 +49,27 @@ exports.loginUser = async (req, res) => {
         res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
 };
+
+exports.getUserDetails = async (req, res) => {
+    const { username, access_code } = req.query;
+
+    if (!username || !access_code) {
+        return res.status(400).json({ success: false, message: 'Username and access code are required' });
+    }
+
+    try {
+        const connection = await createConnection();
+        const [user] = await connection.execute('SELECT * FROM tbl_61_users WHERE username = ? AND access_code = ?', [username, access_code]);
+
+        if (user.length === 0) {
+            connection.end();
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        connection.end();
+        res.json({ success: true, user: user[0] });
+    } catch (error) {
+        console.error('Error fetching user details:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+};
